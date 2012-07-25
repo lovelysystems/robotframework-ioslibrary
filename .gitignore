@@ -1,0 +1,6 @@
+.installed.cfg
+bin/buildout
+bin/robotframework
+develop-eggs/
+parts/
+src/robotframework_ioslibrary.egg-info/
