@@ -45,17 +45,37 @@ class IOSLibrary(object):
         return res['results']
 
     def _screen_and_raise(self, err):
-        logging.error(err)
+        logger.warn(err)
         self.capture_screenshot()
         raise Exception
 
-    def _playback(self, request):
-        return self.post('play',request)
+    def _load_playback_data(self, recording, options=None):
+        if options is None:
+            options = {}
+        ios = options["OS"] if options.has_key("OS") else "ios5"
+        device = options["DEVICE"] if options.has_key("DEVICE") else "iphone"
+        if not recording.endswith(".base64"):
+            recording = "%s_%s_%s.base64" % (recording, ios, device)
+        p = os.path.join(os.path.join(os.path.dirname(__file__),'resources'),recording)
+        if os.path.exists(p):
+            with open(p,'r') as f:
+                return f.read()
+        else:
+            self._screen_and_raise('Playback not found: %s' % p)
 
-    def _readfile(self, path):
-        with open(path,'r') as f:
-            return f.read()
- 
+    def _playback(self, recording, options=None):
+        data = self._load_playback_data(recording)
+        post_data = {
+            "events": data
+        }
+        if options['query']:
+            post_data['query']=options['query']
+        res = json.loads(self.post('play',json.dumps(post_data)).text)
+        if res['outcome'] != 'SUCCESS':
+            self._screen_and_raise('playback failed because: %s \n %s' % (res['reason'],res['details']))
+        return res['results']
+        
+
     # BEGIN: STOLEN FROM SELENIUM2LIBRARY
 
     def _get_log_dir(self):
@@ -86,13 +106,7 @@ class IOSLibrary(object):
         return self._map(query,"query_all")
 
     def touch(self, query):
-        p = os.path.abspath("resources")
-        p = os.path.join(p,"touch_ios5_iphone.base64")
-        p = self._readfile(p).replace("\n",'')
-        self._play({
-            "query":json.loads(query),
-            "events":p
-        })
+        self._playback("touch",{"query":query})
 
     def check_element_does_exist(self,query):
         assert self.search_ui_elements(query)["results"]
