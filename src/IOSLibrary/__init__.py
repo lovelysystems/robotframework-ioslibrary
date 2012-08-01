@@ -78,8 +78,8 @@ class IOSLibrary(object):
     def _load_playback_data(self, recording, options=None):
         if options is None:
             options = {}
-        ios = options["OS"] if options.has_key("OS") else "ios5"
-        device = options["DEVICE"] if options.has_key("DEVICE") else "iphone"
+        ios = options.get("OS", "ios5")
+        device = options.get("DEVICE","iphone")
         if not recording.endswith(".base64"):
             recording = "%s_%s_%s.base64" % (recording, ios, device)
         p = os.path.join(os.path.join(os.path.dirname(__file__),'resources'),recording)
