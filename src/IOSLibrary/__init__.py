@@ -30,7 +30,7 @@ class IOSLibrary(object):
         self._screenshot_index = 0
         self._current_orientation = 0
 
-    def post(self, endp, request):
+    def _post(self, endp, request):
         logging.info("Request to device %s: %s", self._url+endp, request)
 
         res = requests.post(self._url+endp, data=request, headers={
@@ -40,7 +40,7 @@ class IOSLibrary(object):
         logging.info("Response from device %s: %s", self._url+endp, res.text)
         return res
 
-    def get(self,endp):
+    def _get(self,endp):
         res = requests.get(self._url+endp)
         assert res.status_code == 200, (
                 "Device sent http status code %d" % res.status_code)
@@ -54,14 +54,14 @@ class IOSLibrary(object):
                 "method_name":method_name
             }
         })
-        res = self.post("map",data)
+        res = self._post("map",data)
         res = json.loads(res.text)
         if res['outcome'] != 'SUCCESS':
             self._screen_and_raise('map %s failed because: %s \n %s' % (query, res['reason'], res['details']))
         return res['results']
 
     def _screenshot(self, filename=None):
-        res = self.get('screenshot')
+        res = self._get('screenshot')
         path, link = self._get_screenshot_paths(filename)
         with open(path,'w') as f:
             f.write(res.content)
@@ -101,7 +101,7 @@ class IOSLibrary(object):
                     post_data['reverse']=options['reverse']
                 if options.has_key('prototype'):
                     post_data['prototype']=options['prototype']
-        res = json.loads(self.post('play',json.dumps(post_data)).text)
+        res = json.loads(self._post('play',json.dumps(post_data)).text)
         if res['outcome'] != 'SUCCESS':
             self._screen_and_raise('playback failed because: %s \n %s' % (res['reason'],res['details']))
         return res['results']
@@ -131,6 +131,10 @@ class IOSLibrary(object):
         return True
 
     def query(self, query):
+        '''
+        Query a UIElement
+        Syntax: https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
+        '''
         return self._map(query,"query")
 
     def query_all(self, query):
@@ -166,9 +170,19 @@ class IOSLibrary(object):
     # DEFINITIONS
 
     def touch(self, query):
+        '''
+        Touch element specified by query
+
+        `query` query to specify the element
+        '''
         self._playback("touch",{"query":query})
 
     def touch_position(self, x=0, y=0):
+        '''
+        Touch position
+        
+        `x` `y` position to touch
+        '''
         self._playback("touch",
                     {"offset":{
                         "x":x,
@@ -177,27 +191,45 @@ class IOSLibrary(object):
                     })
 
     def capture_screenshot(self,filename=None):
+        '''
+        Captures a screenshot of the current screen and embeds it in the test report
+
+        `filename` Location where the screenshot will be saved.
+        '''
         self._screenshot(filename)
 
     def toggle_switch(self, name=None):
+        '''
+        toggle switch
+
+        `name` (optional) Switch to toggle
+        '''
         if not name:
             self.touch("switch")
         else:
             self.touch("switch marked:'%s'" % name)
 
-    def touch_text(self, name=None):
-        if not name:
+    def touch_text(self, placeholder=None):
+        '''
+        Touch a Textfield
+
+        `placeholder` (optional) of textField to touch
+        '''
+        if not placeholder:
             self.touch("textField")
         else:
-            self.touch("textField placeholder:'%s'" % name)
+            self.touch("textField placeholder:'%s'" % placeholder)
 
     def go_back(self):
+        '''
+        Touch the first Navigationitem in a Navigation Bar
+        '''
         self.touch("navigationItemButtonView first")
 
-    def enter_background(self, time=10):
-        self.post('background',json.dumps({'duration':time}))         
-
     def rotate(self, direction):
+        '''
+        Rotate simulator { left | right }
+        '''
         if direction == "right":
             self._current_orientation -= 90
         elif direction == "left":
@@ -207,20 +239,36 @@ class IOSLibrary(object):
         self._rotate_to(self._current_orientation, direction)
 
     def set_device_orientation_to(self, orientation, direction="left"):
+        '''
+        Set orientation of simulator to { up | down | left | right}
+        '''
         degrees = ORIENTATIONS[orientation]
         self._rotate_to(degrees, direction)
 
     def scroll(self, direction, query = "scrollView index:0"):
+        '''
+        Scroll { up | down | left | right}
+        '''
         views_touched = self._map(query, "scroll", [direction])
         if not views_touched:
             self._screen_and_raise("could not find a view to scroll: %s" % query)
+
     def pinch(self, direction, query = None):
+        '''
+        pinch {in | out}
+
+        `direction` in or out
+        `query` (optional) to specify an element to pinch on
+        '''
         options = {}
         if query:
            options = {"query":query} 
         self._pinch(direction, options)
 
     def swipe(self, direction):
+        '''
+        { up | down | left | right}
+        '''
         degrees = ORIENTATIONS[direction]
         direction = (360 - self._current_orientation) + degrees
         direction = self._reduce_degrees(direction)
@@ -228,6 +276,11 @@ class IOSLibrary(object):
         self._playback("swipe_%s" % direction)
 
     def screen_should_contain(self, expected):
+        '''
+        Asserts that the current screen contains a given text or view
+
+        `expected` { String | View } that should be on the current screen
+        '''
         res = (self._element_exists("view marked:'%s'" % expected) or
                self._element_exists("view text:'%s'" % expected))
         if not res:
