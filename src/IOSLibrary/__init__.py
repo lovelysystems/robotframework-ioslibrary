@@ -46,7 +46,9 @@ class IOSLibrary(object):
                 "Device sent http status code %d" % res.status_code)
         return res
 
-    def _map(self, query, method_name, args=[]):
+    def _map(self, query, method_name, args=None):
+        if args is None:
+            args = {}
         data = json.dumps({
             "query":query,
             "operation":{
