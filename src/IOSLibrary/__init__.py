@@ -93,14 +93,7 @@ class IOSLibrary(object):
             "events": data
         }
         if options:
-                if options.has_key('query'):
-                    post_data['query']=options['query']
-                if options.has_key('offset'):
-                    post_data['offset']=options['offset']
-                if options.has_key('reverse'):
-                    post_data['reverse']=options['reverse']
-                if options.has_key('prototype'):
-                    post_data['prototype']=options['prototype']
+            post_data.update(options)
         res = json.loads(self._post('play',json.dumps(post_data)).text)
         if res['outcome'] != 'SUCCESS':
             self._screen_and_raise('playback failed because: %s \n %s' % (res['reason'],res['details']))
