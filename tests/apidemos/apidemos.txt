@@ -1,0 +1,47 @@
+*** Settings ***
+
+Library                 IOSLibrary      localhost:37265
+
+*** Test Cases ***
+
+I can search for buttons
+    Query  "button"
+
+I can touch buttons
+   touch   button
+
+I can take a screenshot
+   Capture Screenshot
+
+I can touch position
+   Touch position  x=35   y=35
+
+I can toggle switch
+    touch   tabBarButton index:0
+    Toggle switch
+
+I can scroll
+    touch   tabBarButton index:2
+    scroll  up
+    scroll  down query=scrollView index:0  
+
+I can pinch
+    touch   tabBarButton index:1
+    pinch   out
+    pinch   in  view:'MKMapView'
+
+I can swipe
+    Set device orientation to   down
+    swipe   right
+    swipe   left
+
+I can check content
+    touch   tabBarButton index:0
+    Screen should contain   Name
+    
+I can rotate the device to
+    Set device orientation to   left
+    Set device orientation to   right
+    Set device orientation to   up
+    rotate  right
+    Set device orientation to   down    direction=left

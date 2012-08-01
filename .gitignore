@@ -4,3 +4,12 @@ bin/robotframework
 develop-eggs/
 parts/
 src/robotframework_ioslibrary.egg-info/
+*.pyc
+ios-screenshot*.png
+.irb-history
+.irbrc
+irb_ios*.sh
+log.html
+output.xml
+report.html
+.DS_Store
