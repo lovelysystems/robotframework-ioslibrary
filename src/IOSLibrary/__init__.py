@@ -125,6 +125,11 @@ class IOSLibrary(object):
             degrees +=360
         return degrees
 
+    def _element_exists(self, query):
+        if not self.query(query):
+            return False
+        return True
+
     def query(self, query):
         return self._map(query,"query")
 
@@ -170,12 +175,6 @@ class IOSLibrary(object):
                         "y":y
                         }
                     })
-
-    def check_element_does_exist(self,query):
-        assert self.search_ui_elements(query)["results"]
-
-    def check_element_does_not_exist(self,query):
-        assert not self.search_ui_elements(query)["results"]
 
     def capture_screenshot(self,filename=None):
         self._screenshot(filename)
@@ -227,5 +226,11 @@ class IOSLibrary(object):
         direction = self._reduce_degrees(direction)
         direction = ORIENTATIONS_REV[direction]
         self._playback("swipe_%s" % direction)
+
+    def screen_should_contain(self, expected):
+        res = (self._element_exists("view marked:'%s'" % expected) or
+               self._element_exists("view text:'%s'" % expected))
+        if not res:
+            self._screen_and_raise("No element found with mark or text %s" % expected)
 
     # END: DEFINITIONS
