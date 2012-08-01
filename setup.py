@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+from os.path import join, dirname
+
+execfile(join(dirname(__file__), 'src', 'IOSLibrary', 'version.py'))
+
 from distutils.core import setup
 
 CLASSIFIERS = """
@@ -7,12 +11,11 @@ Programming Language :: Python
 Topic :: Software Development :: Testing
 """[1:-1]
 
-from os.path import join, dirname
 long_description=open(join(dirname(__file__), 'README.rst',)).read()
 
 setup(
   name             = 'robotframework-ioslibrary',
-  version          = "0.0.1",
+  version          = VERSION,
   description      = 'Robot Framework Automation Library for iOS',
   long_description = long_description,
   author           = '',

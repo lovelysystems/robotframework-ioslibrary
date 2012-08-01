@@ -7,6 +7,11 @@ import time
 from robot.variables import GLOBAL_VARIABLES
 from robot.api import logger
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+execfile(os.path.join(THIS_DIR, 'version.py'))
+
+__version__ = VERSION
+
 ORIENTATIONS = {
     "down":0,
     "right":90,
@@ -21,8 +26,10 @@ ORIENTATIONS_REV = {
     270:"left"
 }
 
+
 class IOSLibrary(object):
 
+    ROBOT_LIBRARY_VERSION = VERSION
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
     def __init__(self, device_endpoint='localhost:37265'):
@@ -48,7 +55,7 @@ class IOSLibrary(object):
 
     def _map(self, query, method_name, args=None):
         if args is None:
-            args = []
+            args = {}
         data = json.dumps({
             "query":query,
             "operation":{
