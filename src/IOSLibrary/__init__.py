@@ -48,7 +48,7 @@ class IOSLibrary(object):
 
     def _map(self, query, method_name, args=None):
         if args is None:
-            args = {}
+            args = []
         data = json.dumps({
             "query":query,
             "operation":{
