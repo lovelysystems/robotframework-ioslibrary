@@ -29,36 +29,6 @@ ORIENTATIONS_REV = {
 
 DEFAULT_SIMULATOR = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator"
 
-
-if hasattr(subprocess, 'check_output'):
-    # Python >= 2.7
-    from subprocess import check_output as execute
-else:
-    # Python < 2.7
-    def execute(*popenargs, **kwargs):
-        if 'stdout' in kwargs:
-            raise ValueError('stdout argument not allowed, it will be overridden.')
-        process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
-        output, unused_err = process.communicate()
-        retcode = process.poll()
-        if retcode:
-            cmd = kwargs.get("args")
-            if cmd is None:
-                cmd = popenargs[0]
-            raise subprocess.CalledProcessError(retcode, cmd, output=output)
-        return output
-
-    class CalledProcessError(Exception):
-        def __init__(self, returncode, cmd, output=None):
-            self.returncode = returncode
-            self.cmd = cmd
-            self.output = output
-        def __str__(self):
-            return "Command '%s' returned non-zero exit status %d" % (
-                self.cmd, self.returncode)
-    # overwrite CalledProcessError due to `output` keyword might be not available
-    subprocess.CalledProcessError = CalledProcessError
-
 class IOSLibrary(object):
 
     ROBOT_LIBRARY_VERSION = VERSION
@@ -69,6 +39,7 @@ class IOSLibrary(object):
         self._screenshot_index = 0
         self._current_orientation = 0
         self._emulator = DEFAULT_SIMULATOR
+        assert os.path.exists(self._emulator), "Couldn't find simulator at %s" % self._emulator
         self._device = "iPhone"
 
     def set_device(self, device):
@@ -84,7 +55,6 @@ class IOSLibrary(object):
         Starts the simulator with a specific app
         '''
         assert os.path.exists(app), "Couldn't find app binary at %s" % app
-        assert os.path.exists(self._emulator), "Couldn't find simulator at %s" % self._emulator
         self._app = app
 
         cmd = [self._emulator,'-SimulateDevice',self._device, '-SimulateApplication',app]
@@ -97,21 +67,8 @@ class IOSLibrary(object):
         cmd = "`echo 'application \"iPhone Simulator\" quit' | osascript`"
         subprocess.Popen(cmd,shell=True)
 
-    def wait_for_device(self):
-        '''
-        Wait for the simulator to become available
-        '''
-        success = False
-        for i in range(0,10):
-            try:
-                res = requests.get(self._url)
-                if res.status_code == 405:
-                    success = True
-                    break
-            except Exception:
-                time.sleep(1)
-                continue
-        assert success, ("Simulator did not respond")
+    def is_device_available(self):
+        assert requests.get(self._url).status_code == 405, "Device is not available"
 
     def _post(self, endp, request):
         logging.info("Request to device %s: %s", self._url+endp, request)

@@ -7,8 +7,11 @@ Suite Teardown          Stop Emulator
 
 *** Keywords ***
 Setup Emulator
-    Start Emulator      sample.app
-    Wait For Device
+    Start Emulator      sample.app/LPSimpleExample\ copy
+    Wait Until Keyword Succeeds
+    ...   1min
+    ...   5sec
+    ...   Is device available
 
 *** Test Cases ***
 
