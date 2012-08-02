@@ -28,5 +28,6 @@ setup(
   classifiers      = CLASSIFIERS.splitlines(),
   package_dir      = {'' : 'src'},
   install_requires = ['robotframework', 'requests'],
-  packages         = ['IOSLibrary']
+  packages         = ['IOSLibrary'],
+  package_data     = {'IOSLibrary': ['resources/*']}
 )

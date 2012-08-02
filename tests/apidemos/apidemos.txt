@@ -49,6 +49,9 @@ I can swipe
 I can check content
     touch   tabBarButton index:0
     Screen should contain   Name
+
+I can enter text
+    Set text    Hallo du Ei   query=textField
     
 I can rotate the device to
     Set device orientation to   left
