@@ -5,7 +5,6 @@ import json
 import os
 import robot
 import time
-import socket
 from robot.variables import GLOBAL_VARIABLES
 from robot.api import logger
 
@@ -103,7 +102,6 @@ class IOSLibrary(object):
         Wait for the simulator to become available
         '''
         success = False
-        s = socket.socket()
         for i in range(0,10):
             try:
                 res = requests.get(self._url)
