@@ -2,6 +2,14 @@
 
 Library                 IOSLibrary      localhost:37265
 
+Suite Setup             Setup Emulator
+Suite Teardown          Stop Emulator
+
+*** Keywords ***
+Setup Emulator
+    Start Emulator      sample.app
+    Wait For Device
+
 *** Test Cases ***
 
 I can search for buttons

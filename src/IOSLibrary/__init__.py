@@ -1,9 +1,11 @@
 import requests
 import logging
+import subprocess
 import json
 import os
 import robot
 import time
+import socket
 from robot.variables import GLOBAL_VARIABLES
 from robot.api import logger
 
@@ -26,6 +28,37 @@ ORIENTATIONS_REV = {
     270:"left"
 }
 
+DEFAULT_SIMULATOR = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator"
+
+
+if hasattr(subprocess, 'check_output'):
+    # Python >= 2.7
+    from subprocess import check_output as execute
+else:
+    # Python < 2.7
+    def execute(*popenargs, **kwargs):
+        if 'stdout' in kwargs:
+            raise ValueError('stdout argument not allowed, it will be overridden.')
+        process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+        output, unused_err = process.communicate()
+        retcode = process.poll()
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+            raise subprocess.CalledProcessError(retcode, cmd, output=output)
+        return output
+
+    class CalledProcessError(Exception):
+        def __init__(self, returncode, cmd, output=None):
+            self.returncode = returncode
+            self.cmd = cmd
+            self.output = output
+        def __str__(self):
+            return "Command '%s' returned non-zero exit status %d" % (
+                self.cmd, self.returncode)
+    # overwrite CalledProcessError due to `output` keyword might be not available
+    subprocess.CalledProcessError = CalledProcessError
 
 class IOSLibrary(object):
 
@@ -36,6 +69,51 @@ class IOSLibrary(object):
         self._url = 'http://%s/' % device_endpoint
         self._screenshot_index = 0
         self._current_orientation = 0
+        self._emulator = DEFAULT_SIMULATOR
+        self._device = "iPhone"
+
+    def set_device(self, device):
+        ''' 
+        Set the simulated device
+
+        `device` {iPhone | iPad | iPhone (Retina) | iPad (Retina)}
+        '''
+        self._device = device
+
+    def start_emulator(self,app):
+        '''
+        Starts the simulator with a specific app
+        '''
+        assert os.path.exists(app), "Couldn't find app binary at %s" % app
+        assert os.path.exists(self._emulator), "Couldn't find simulator at %s" % self._emulator
+        self._app = app
+
+        cmd = [self._emulator,'-SimulateDevice',self._device, '-SimulateApplication',app]
+        self._emulator_proc = subprocess.Popen(cmd)
+        
+    def stop_emulator(self):
+        '''
+        Stops a previously started emulator
+        '''
+        cmd = "`echo 'application \"iPhone Simulator\" quit' | osascript`"
+        subprocess.Popen(cmd,shell=True)
+
+    def wait_for_device(self):
+        '''
+        Wait for the simulator to become available
+        '''
+        success = False
+        s = socket.socket()
+        for i in range(0,10):
+            try:
+                res = requests.get(self._url)
+                if res.status_code == 405:
+                    success = True
+                    break
+            except Exception:
+                time.sleep(1)
+                continue
+        assert success, ("Simulator did not respond")
 
     def _post(self, endp, request):
         logging.info("Request to device %s: %s", self._url+endp, request)
