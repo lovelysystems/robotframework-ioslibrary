@@ -65,7 +65,9 @@ class IOSLibrary(object):
         Stops a previously started emulator
         '''
         cmd = "`echo 'application \"iPhone Simulator\" quit' | osascript`"
-        subprocess.Popen(cmd,shell=True)
+        stop_proc = subprocess.Popen(cmd,shell=True)
+        stop_proc.wait()
+        self._emulator_proc.wait()
 
     def is_device_available(self):
         assert requests.get(self._url).status_code == 405, "Device is not available"
@@ -254,6 +256,11 @@ class IOSLibrary(object):
             self.touch("textField")
         else:
             self.touch("textField placeholder:'%s'" % placeholder)
+
+    def set_text(self, txt, query="textField"):
+        text_fields_modified = self._map(query, "setText", [txt])
+        if not text_fields_modified:
+            self._screen_and_raise("could not find text field %s" % query)
 
     def go_back(self):
         '''
