@@ -329,4 +329,12 @@ class IOSLibrary(object):
         if not res:
             self._screen_and_raise("No element found with mark or text %s" % expected)
 
+    def webview_should_contain(self, expected):
+        ''' 
+        Asserts that the current webview contains a given text
+        '''
+        res = self.query("webView css:'body'")
+        assert res, "No WebView found"
+        assert expected in res[0]["html"], "%s not found in webView" % expected
+
     # END: DEFINITIONS
