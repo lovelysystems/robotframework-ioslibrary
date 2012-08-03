@@ -10,6 +10,15 @@ It uses `Calabash iOS Server
 instrumented iOS application similar to how `Selenium WebDriver
 <http://seleniumhq.org/projects/webdriver/>`_ talks to your web browser.
 
+Installation
+------------
+
+To install, just fetch the latest version from PyPI:.
+
+    pip install --upgrade robotframework-ioslibrary
+
+To prepare your iOS app look at <https://github.com/calabash/calabash-ios#installation>
+
 License
 +++++++
 
