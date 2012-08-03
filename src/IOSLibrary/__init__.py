@@ -335,7 +335,6 @@ class IOSLibrary(object):
         '''
         res = self.query("webView css:'body'")
         assert res, "No WebView found"
-        logging.error(res[0]["html"])
         assert expected in res[0]["html"], "%s not found in webView" % expected
 
     # END: DEFINITIONS
