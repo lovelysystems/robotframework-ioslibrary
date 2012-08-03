@@ -324,7 +324,8 @@ class IOSLibrary(object):
         `expected` { String | View } that should be on the current screen
         '''
         res = (self._element_exists("view marked:'%s'" % expected) or
-               self._element_exists("view text:'%s'" % expected))
+               self._element_exists("view text:'%s'" % expected) or
+               self._element_exists(expected))
         if not res:
             self._screen_and_raise("No element found with mark or text %s" % expected)
 
