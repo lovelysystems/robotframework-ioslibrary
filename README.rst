@@ -17,6 +17,9 @@ To install, just fetch the latest version from PyPI:.
 
     pip install --upgrade robotframework-ioslibrary
 
+Prepare your iOS app
+--------------------
+
 To prepare your iOS app look at <https://github.com/calabash/calabash-ios#installation>
 
 License
