@@ -59,3 +59,8 @@ I can rotate the device to
     Set device orientation to   up
     rotate  right
     Set device orientation to   down    direction=left
+
+I can handle webviews
+    touch   tabBarButton index:3
+    Webview should not be empty
+    Webview should contain  Google

@@ -154,6 +154,7 @@ class IOSLibrary(object):
         orientation = ORIENTATIONS_REV[orientation]
         playback = "rotate_%s_home_%s" % (direction,orientation)
         self._playback(playback)
+        time.sleep(1)
 
     def _reduce_degrees(self, degrees):
         while degrees >=360:
@@ -166,6 +167,13 @@ class IOSLibrary(object):
         if not self.query(query):
             return False
         return True
+
+
+    def _get_webview_html(self, index):
+        res = self.query("webView css:'body'")
+        if not res or not res[index]:
+            self._screen_and_raise("No WebView with index %i found" % index)
+        return res[index]["html"]
 
     def query(self, query):
         '''
@@ -333,12 +341,22 @@ class IOSLibrary(object):
         if not res:
             self._screen_and_raise("No element found with mark or text %s" % expected)
 
-    def webview_should_contain(self, expected):
+    def webview_should_contain(self, expected, index=0):
         ''' 
         Asserts that the current webview contains a given text
+
+        `index` index of the webView (default = 0)
         '''
-        res = self.query("webView css:'body'")
-        assert res, "No WebView found"
-        assert expected in res[0]["html"], "%s not found in webView" % expected
+        if not expected in self._get_webview_html(index):
+            self._screen_and_raise("%s not found in webView" % expected)
+
+    def webview_should_not_be_empty(self, index=0):
+        '''
+        Asserts that the current webview is not empty
+
+        `index` index of the webView (default = 0)
+        '''
+        if not self._get_webview_html(index):
+            self._screen_and_raise("Webview is empty")
 
     # END: DEFINITIONS
