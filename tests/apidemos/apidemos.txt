@@ -63,4 +63,5 @@ I can rotate the device to
 I can handle webviews
     touch   tabBarButton index:3
     Webview should not be empty
-    Webview should contain  Google
+    Wait Until Keyword Succeeds   10sec   2sec
+    ...     Webview should contain  Google
