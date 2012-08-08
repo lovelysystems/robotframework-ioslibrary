@@ -207,7 +207,7 @@ class IOSLibrary(object):
             filename = os.path.join('screenshots', filename)
             screen_dir = os.path.join(logdir, 'screenshots')
             if not os.path.exists(screen_dir):
-                os.makedir(screen_dir)
+                os.mkdir(screen_dir)
         else:
             filename = filename.replace('/', os.sep)
         path = os.path.join(logdir, filename)
