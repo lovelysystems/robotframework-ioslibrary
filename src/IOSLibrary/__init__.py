@@ -192,12 +192,16 @@ class IOSLibrary(object):
         return GLOBAL_VARIABLES['${OUTPUTDIR}']
 
     def _get_screenshot_paths(self, filename):
+        logdir = self._get_log_dir()
         if not filename:
             self._screenshot_index += 1
             filename = 'ios-screenshot-%d.png' % self._screenshot_index
+            filename = os.path.join('screenshots', filename)
+            screen_dir = os.path.join(logdir, 'screenshots')
+            if not os.path.exists(screen_dir):
+                os.makedir(screen_dir)
         else:
             filename = filename.replace('/', os.sep)
-        logdir = self._get_log_dir()
         path = os.path.join(logdir, filename)
         link = robot.utils.get_link_path(path, logdir)
         return path, link
