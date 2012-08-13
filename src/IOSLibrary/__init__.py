@@ -70,7 +70,15 @@ class IOSLibrary(object):
         self._emulator_proc.wait()
 
     def is_device_available(self):
-        assert requests.get(self._url).status_code == 405, "Device is not available"
+        logging.getLogger().setLevel(logging.ERROR)
+        status_code = 0
+        try:
+            status_code = requests.get(self._url).status_code
+        except:
+            raise
+        finally:
+            logging.getLogger().setLevel(logging.WARNING)
+        assert status_code == 405, "Device is not available"
 
     def _post(self, endp, request):
         logging.info("Request to device %s: %s", self._url+endp, request)
@@ -101,7 +109,7 @@ class IOSLibrary(object):
         res = self._post("map",data)
         res = json.loads(res.text)
         if res['outcome'] != 'SUCCESS':
-            self._screen_and_raise('map %s failed because: %s \n %s' % (query, res['reason'], res['details']))
+            self._failure('map %s failed because: %s \n %s' % (query, res['reason'], res['details']))
         return res['results']
 
     def _screenshot(self, filename=None):
@@ -112,10 +120,8 @@ class IOSLibrary(object):
         logger.info('</td></tr><tr><td colspan="3"><a href="%s">'
                    '<img src="%s"></a>' % (link, link), True, False)
 
-    def _screen_and_raise(self, err):
-        logger.warn(err)
-        self._screenshot()
-        raise Exception
+    def _failure(self, err):
+        raise Exception(err)
 
     def _load_playback_data(self, recording, options=None):
         if options is None:
@@ -129,7 +135,7 @@ class IOSLibrary(object):
             with open(p,'r') as f:
                 return f.read()
         else:
-            self._screen_and_raise('Playback not found: %s' % p)
+            self._failure('Playback not found: %s' % p)
 
     def _playback(self, recording, options=None):
         data = self._load_playback_data(recording)
@@ -140,7 +146,7 @@ class IOSLibrary(object):
             post_data.update(options)
         res = json.loads(self._post('play',json.dumps(post_data)).text)
         if res['outcome'] != 'SUCCESS':
-            self._screen_and_raise('playback failed because: %s \n %s' % (res['reason'],res['details']))
+            self._failure('playback failed because: %s \n %s' % (res['reason'],res['details']))
         return res['results']
         
     def _rotate_to(self, orientation, direction="left"):
@@ -172,7 +178,7 @@ class IOSLibrary(object):
     def _get_webview_html(self, index):
         res = self.query("webView css:'body'")
         if not res or not res[index]:
-            self._screen_and_raise("No WebView with index %i found" % index)
+            self._failure("No WebView with index %i found" % index)
         return res[index]["html"]
 
     def query(self, query):
@@ -272,7 +278,7 @@ class IOSLibrary(object):
     def set_text(self, txt, query="textField"):
         text_fields_modified = self._map(query, "setText", [txt])
         if not text_fields_modified:
-            self._screen_and_raise("could not find text field %s" % query)
+            self._failure("could not find text field %s" % query)
 
     def go_back(self):
         '''
@@ -289,7 +295,7 @@ class IOSLibrary(object):
         elif direction == "left":
             self._current_orientation += 90
         else:
-            self._screen_and_raise("not a valid direction %s" % direction)
+            self._failure("not a valid direction %s" % direction)
         self._rotate_to(self._current_orientation, direction)
 
     def set_device_orientation_to(self, orientation, direction="left"):
@@ -305,7 +311,7 @@ class IOSLibrary(object):
         '''
         views_touched = self._map(query, "scroll", [direction])
         if not views_touched:
-            self._screen_and_raise("could not find a view to scroll: %s" % query)
+            self._failure("could not find a view to scroll: %s" % query)
 
     def pinch(self, direction, query = None):
         '''
@@ -336,10 +342,10 @@ class IOSLibrary(object):
         `expected` { String | View } that should be on the current screen
         '''
         res = (self._element_exists("view marked:'%s'" % expected) or
-               self._element_exists("view text:'%s'" % expected) or
+               self._element_exists("view text:%s" % expected) or
                self._element_exists(expected))
         if not res:
-            self._screen_and_raise("No element found with mark or text %s" % expected)
+            self._failure("No element found with mark or text %s" % expected)
 
     def webview_should_contain(self, expected, index=0):
         ''' 
@@ -348,7 +354,7 @@ class IOSLibrary(object):
         `index` index of the webView (default = 0)
         '''
         if not expected in self._get_webview_html(index):
-            self._screen_and_raise("%s not found in webView" % expected)
+            self._failure("%s not found in webView" % expected)
 
     def webview_should_not_be_empty(self, index=0):
         '''
@@ -357,6 +363,6 @@ class IOSLibrary(object):
         `index` index of the webView (default = 0)
         '''
         if not self._get_webview_html(index):
-            self._screen_and_raise("Webview is empty")
+            self._failure("Webview is empty")
 
     # END: DEFINITIONS
