@@ -7,6 +7,7 @@ Suite Teardown          Stop Emulator
 
 *** Keywords ***
 Setup Emulator
+    Set Emulator    /Applications/Xcode.app/Contents/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator
     Start Emulator      sample.app/LPSimpleExample\ copy
     Wait Until Keyword Succeeds
     ...   1min

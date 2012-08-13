@@ -27,7 +27,7 @@ ORIENTATIONS_REV = {
     270:"left"
 }
 
-DEFAULT_SIMULATOR = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator"
+DEFAULT_SIMULATOR = "/Applications/Xcode.app/Contents/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator"
 
 class IOSLibraryException(Exception):
     pass
@@ -41,9 +41,13 @@ class IOSLibrary(object):
         self._url = 'http://%s/' % device_endpoint
         self._screenshot_index = 0
         self._current_orientation = 0
-        self._emulator = DEFAULT_SIMULATOR
-        assert os.path.exists(self._emulator), "Couldn't find simulator at %s" % self._emulator
+        if os.path.exists(DEFAULT_SIMULATOR):
+            self.set_emulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
+
+    def set_emulator(self, emulator):
+        assert os.path.exists(emulator), "Couldn't find simulator at %s" % self._emulator
+        self._emulator = emulator
 
     def set_device(self, device):
         ''' 
