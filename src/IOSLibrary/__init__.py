@@ -42,12 +42,12 @@ class IOSLibrary(object):
         self._screenshot_index = 0
         self._current_orientation = 0
         if os.path.exists(DEFAULT_SIMULATOR):
-            self.set_emulator(DEFAULT_SIMULATOR)
+            self.set_simulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
 
-    def set_emulator(self, emulator):
-        assert os.path.exists(emulator), "Couldn't find simulator at %s" % self._emulator
-        self._emulator = emulator
+    def set_simulator(self, simulator):
+        assert os.path.exists(simulator), "Couldn't find simulator at %s" % self._simulator
+        self._simulator = simulator
 
     def set_device(self, device):
         ''' 
@@ -57,24 +57,24 @@ class IOSLibrary(object):
         '''
         self._device = device
 
-    def start_emulator(self,app):
+    def start_simulator(self,app):
         '''
         Starts the simulator with a specific app
         '''
         assert os.path.exists(app), "Couldn't find app binary at %s" % app
         self._app = app
 
-        cmd = [self._emulator,'-SimulateDevice',self._device, '-SimulateApplication',app]
-        self._emulator_proc = subprocess.Popen(cmd)
+        cmd = [self._simulator,'-SimulateDevice',self._device, '-SimulateApplication',app]
+        self._simulator_proc = subprocess.Popen(cmd)
         
-    def stop_emulator(self):
+    def stop_simulator(self):
         '''
-        Stops a previously started emulator
+        Stops a previously started simulator
         '''
         cmd = "`echo 'application \"iPhone Simulator\" quit' | osascript`"
         stop_proc = subprocess.Popen(cmd,shell=True)
         stop_proc.wait()
-        self._emulator_proc.wait()
+        self._simulator_proc.wait()
 
     def is_device_available(self):
         logging.getLogger().setLevel(logging.ERROR)

@@ -2,13 +2,13 @@
 
 Library                 IOSLibrary      localhost:37265
 
-Suite Setup             Setup Emulator
-Suite Teardown          Stop Emulator
+Suite Setup             Setup Simulator
+Suite Teardown          Stop Simulator
 
 *** Keywords ***
-Setup Emulator
-    Set Emulator    /Applications/Xcode.app/Contents/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator
-    Start Emulator      sample.app/LPSimpleExample\ copy
+Setup Simulator
+    Set Simulator    /Applications/Xcode.app/Contents/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator
+    Start Simulator      sample.app/LPSimpleExample\ copy
     Wait Until Keyword Succeeds
     ...   1min
     ...   5sec
