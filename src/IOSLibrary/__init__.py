@@ -335,14 +335,21 @@ class IOSLibrary(object):
         direction = ORIENTATIONS_REV[direction]
         self._playback("swipe_%s" % direction)
 
+    def screen_should_contain_text(self, expected):
+        '''
+        Asserts that the current screen contains a given text
+        '''
+        if not self._element_exists("view {text == '%s'}" % expected.replace("'", r"\'")):
+            self._failure("No text %s found" % expected)
+
     def screen_should_contain(self, expected):
         '''
-        Asserts that the current screen contains a given text or view
+        Asserts that the current screen contains a given element specified by name
+        or query
 
         `expected` { String | View } that should be on the current screen
         '''
         res = (self._element_exists("view marked:'%s'" % expected) or
-               self._element_exists("view text:%s" % expected) or
                self._element_exists(expected))
         if not res:
             self._failure("No element found with mark or text %s" % expected)

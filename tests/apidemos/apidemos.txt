@@ -51,7 +51,8 @@ I can check content
     Screen should contain   Name
 
 I can enter text
-    Set text    Hallo du Ei   query=textField
+    Set text    Spam   query=textField
+    Screen should contain text  Spam
     
 I can rotate the device to
     Set device orientation to   left
