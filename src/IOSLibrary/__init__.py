@@ -27,8 +27,8 @@ ORIENTATIONS_REV = {
     270: "left"
 }
 
-DEFAULT_SIMULATOR = "/Applications/Xcode.app/Contents/Applications/\
-                    iPhone Simulator.app/Contents/MacOS/iPhone Simulator"
+DEFAULT_SIMULATOR = ("/Applications/Xcode.app/Contents/Applications/" +
+                     "iPhone Simulator.app/Contents/MacOS/iPhone Simulator")
 
 
 class IOSLibraryException(Exception):
@@ -49,8 +49,8 @@ class IOSLibrary(object):
         self._device = "iPhone"
 
     def set_simulator(self, simulator):
-        assert os.path.exists(simulator),\
-            "Couldn't find simulator at %s" % self._simulator
+        assert os.path.exists(simulator), ("Couldn't find simulator at %s" %
+                                           self._simulator)
         self._simulator = simulator
 
     def set_device(self, device):
