@@ -29,6 +29,9 @@ ORIENTATIONS_REV = {
 
 DEFAULT_SIMULATOR = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator"
 
+class IOSLibraryException(Exception):
+    pass
+
 class IOSLibrary(object):
 
     ROBOT_LIBRARY_VERSION = VERSION
@@ -109,7 +112,7 @@ class IOSLibrary(object):
         res = self._post("map",data)
         res = json.loads(res.text)
         if res['outcome'] != 'SUCCESS':
-            raise Exception('map %s failed because: %s \n %s' % (query, res['reason'], res['details']))
+            raise IOSLibraryException('map %s failed because: %s \n %s' % (query, res['reason'], res['details']))
         return res['results']
 
     def _screenshot(self, filename=None):
@@ -132,7 +135,7 @@ class IOSLibrary(object):
             with open(p,'r') as f:
                 return f.read()
         else:
-            raise Exception('Playback not found: %s' % p)
+            raise IOSLibraryException('Playback not found: %s' % p)
 
     def _playback(self, recording, options=None):
         data = self._load_playback_data(recording)
@@ -143,7 +146,7 @@ class IOSLibrary(object):
             post_data.update(options)
         res = json.loads(self._post('play',json.dumps(post_data)).text)
         if res['outcome'] != 'SUCCESS':
-            raise Exception('playback failed because: %s \n %s' % (res['reason'],res['details']))
+            raise IOSLibraryException('playback failed because: %s \n %s' % (res['reason'],res['details']))
         return res['results']
         
     def _rotate_to(self, orientation, direction="left"):
@@ -175,7 +178,7 @@ class IOSLibrary(object):
     def _get_webview_html(self, index):
         res = self.query("webView css:'body'")
         if not res or not res[index]:
-            raise Exception("No WebView with index %i found" % index)
+            raise IOSLibraryException("No WebView with index %i found" % index)
         return res[index]["html"]
 
     def query(self, query):
@@ -275,7 +278,7 @@ class IOSLibrary(object):
     def set_text(self, txt, query="textField"):
         text_fields_modified = self._map(query, "setText", [txt])
         if not text_fields_modified:
-            raise Exception("could not find text field %s" % query)
+            raise IOSLibraryException("could not find text field %s" % query)
 
     def go_back(self):
         '''
@@ -292,7 +295,7 @@ class IOSLibrary(object):
         elif direction == "left":
             self._current_orientation += 90
         else:
-            raise Exception("not a valid direction %s" % direction)
+            raise IOSLibraryException("not a valid direction %s" % direction)
         self._rotate_to(self._current_orientation, direction)
 
     def set_device_orientation_to(self, orientation, direction="left"):
@@ -308,7 +311,7 @@ class IOSLibrary(object):
         '''
         views_touched = self._map(query, "scroll", [direction])
         if not views_touched:
-            raise Exception("could not find a view to scroll: %s" % query)
+            raise IOSLibraryException("could not find a view to scroll: %s" % query)
 
     def pinch(self, direction, query = None):
         '''
@@ -337,7 +340,7 @@ class IOSLibrary(object):
         Asserts that the current screen contains a given text
         '''
         if not self._element_exists("view {text == '%s'}" % expected.replace("'", r"\'")):
-            raise Exception("No text %s found" % expected)
+            raise IOSLibraryException("No text %s found" % expected)
 
     def screen_should_contain(self, expected):
         '''
@@ -349,7 +352,7 @@ class IOSLibrary(object):
         res = (self._element_exists("view marked:'%s'" % expected) or
                self._element_exists(expected))
         if not res:
-            raise Exception("No element found with mark or text %s" % expected)
+            raise IOSLibraryException("No element found with mark or text %s" % expected)
 
     def webview_should_contain(self, expected, index=0):
         ''' 
@@ -358,7 +361,7 @@ class IOSLibrary(object):
         `index` index of the webView (default = 0)
         '''
         if not expected in self._get_webview_html(index):
-            raise Exception("%s not found in webView" % expected)
+            raise IOSLibraryException("%s not found in webView" % expected)
 
     def webview_should_not_be_empty(self, index=0):
         '''
@@ -367,6 +370,6 @@ class IOSLibrary(object):
         `index` index of the webView (default = 0)
         '''
         if not self._get_webview_html(index):
-            raise Exception("Webview is empty")
+            raise IOSLibraryException("Webview is empty")
 
     # END: DEFINITIONS
