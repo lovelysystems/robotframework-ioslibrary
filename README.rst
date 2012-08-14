@@ -1,5 +1,6 @@
+=========================
 robotframework-ioslibrary
---------------------------
+=========================
 
 **robotframework-ioslibrary** is a `Robot Framework
 <http://code.google.com/p/robotframework/>`_ test library for all your iOS
@@ -11,16 +12,44 @@ instrumented iOS application similar to how `Selenium WebDriver
 <http://seleniumhq.org/projects/webdriver/>`_ talks to your web browser.
 
 Installation
-------------
+++++++++++++
 
 To install, just fetch the latest version from PyPI:.
 
     pip install --upgrade robotframework-ioslibrary
 
 Prepare your iOS app
---------------------
+++++++++++++++++++++
 
 To prepare your iOS app look at <https://github.com/calabash/calabash-ios#installation>
+
+Usage
++++++
+
+API documentation can be found at
+`http://lovelysystems.github.com/robotframework-ioslibrary/IOSLibrary.html
+<http://lovelysystems.github.com/robotframework-ioslibrary/IOSLibrary.html>`_,
+here is an example on how to use it:
+
+============  ================
+  Setting          Value
+============  ================
+Library          IOSLibrary
+============  ================
+
+\
+
+============  =================================  ===================================  ==========     ========================
+ Test Case    Action                             Argument                              Argument      Argument
+============  =================================  ===================================  ==========     ========================
+Example
+\             [Documentation]                    Starts the iOS Simulator and swipes
+\             Start Simulator
+\             Wait Until Keyword Succeeds        1 minute                             5 seconds      Is Device Available
+\             Swipe                              right
+\             Rotate                             left
+\             Screen Should Contain              Hello World
+============  =================================  ===================================  ==========     ========================
 
 License
 +++++++
