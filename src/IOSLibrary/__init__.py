@@ -41,6 +41,13 @@ class IOSLibrary(object):
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
     def __init__(self, device_endpoint='localhost:37265'):
+        '''
+        Initialize the IOSLibrary.
+
+        `device_endpoint` endpoint of the test server (the instrumented app).
+        Optional if you are running tests on the local machine against the
+        simulator.
+        '''
         self._url = 'http://%s/' % device_endpoint
         self._screenshot_index = 0
         self._current_orientation = 0
@@ -48,36 +55,49 @@ class IOSLibrary(object):
             self.set_simulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
 
-    def set_simulator(self, simulator):
-        assert os.path.exists(simulator), ("Couldn't find simulator at %s" %
-                                           self._simulator)
-        self._simulator = simulator
+    def set_simulator(self, simulator_path=DEFAULT_SIMULATOR):
+        '''
+        Set the path where the iOS Simulator is found.
 
-    def set_device(self, device):
+        If the iOS Simulator is at the default location, you don't need to call
+        this. However, if you are using beta release of XCode, you can choose
+        which simulator to use.
+
+        `simulator_path` fully qualified path to the iOS Simulator executable.
+        '''
+
+        assert os.path.exists(simulator_path), (
+                "Couldn't find simulator at %s" % simulator_path)
+
+        self._simulator = simulator_path
+
+    def set_device(self, device_name):
         '''
         Set the simulated device
 
-        `device` {iPhone | iPad | iPhone (Retina) | iPad (Retina)}
+        `device` The device to simulate. Valid values are: "iPhone", "iPad", "iPhone (Retina)" and "iPad (Retina)"
         '''
-        self._device = device
+        self._device = device_name
 
-    def start_simulator(self, app):
+    def start_simulator(self, app_path):
         '''
-        Starts the simulator with a specific app
+        Starts the App found at `app_path` in the iOS Simulator.
+
+        `app_path` Path to the binary of the App to start.
         '''
-        assert os.path.exists(app), "Couldn't find app binary at %s" % app
-        self._app = app
+        assert os.path.exists(app_path), "Couldn't find app binary at %s" % app
+        self._app = app_path
 
         cmd = [self._simulator,
                '-SimulateDevice',
                self._device,
                '-SimulateApplication',
-               app]
+               app_path]
         self._simulator_proc = subprocess.Popen(cmd)
 
     def stop_simulator(self):
         '''
-        Stops a previously started simulator
+        Stops a previously started iOS Simulator.
         '''
         cmd = "`echo 'application \"iPhone Simulator\" quit' | osascript`"
         stop_proc = subprocess.Popen(cmd, shell=True)
@@ -85,6 +105,15 @@ class IOSLibrary(object):
         self._simulator_proc.wait()
 
     def is_device_available(self):
+        '''
+        Succeeds if the test server is available for receiving commands.
+
+        This is best used with the `Wait Until Keyword Succeeds` keyword from
+        the BuiltIn library like this:
+
+        Example:
+        | Wait Until Keyword Succeeds | 1 minute | 10 seconds | Is device available |
+        '''
         logging.getLogger().setLevel(logging.ERROR)
         status_code = 0
         try:
@@ -198,12 +227,18 @@ class IOSLibrary(object):
 
     def query(self, query):
         '''
-        Query a UIElement
-        Syntax: https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
+        Search for a UIElement matching `query`
+
+        `query` query selector. The available syntax is documented here https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
         '''
         return self._map(query, "query")
 
     def query_all(self, query):
+        '''
+        Search for all UIElements matching `query`
+
+        `query` query selector. The available syntax is documented here https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
+        '''
         return self._map(query, "query_all")
 
     def _pinch(self, in_out, options={}):
@@ -243,15 +278,17 @@ class IOSLibrary(object):
         '''
         Touch element specified by query
 
-        `query` query to specify the element
+        `query` selector of the element to touch. The available syntax is documented here https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
         '''
         self._playback("touch", {"query": query})
 
     def touch_position(self, x=0, y=0):
         '''
-        Touch position
+        Simulate a touch at the specified position
 
-        `x` `y` position to touch
+        `x` X-Coordinate of the position to touch
+
+        `y` Y-Coordinate of the position to touch
         '''
         self._playback("touch",
                     {"offset": {
@@ -265,15 +302,15 @@ class IOSLibrary(object):
         Captures a screenshot of the current screen and embeds it
         in the test report
 
-        `filename` Location where the screenshot will be saved.
+        `filename` Location where the screenshot will be saved. If omitted a unique filename will be chosen.
         '''
         self._screenshot(filename)
 
     def toggle_switch(self, name=None):
         '''
-        toggle switch
+        Toggle a switch
 
-        `name` (optional) Switch to toggle
+        `name` Name of the switch to toggle.
         '''
         if not name:
             self.touch("switch")
@@ -284,15 +321,23 @@ class IOSLibrary(object):
         '''
         Touch a Textfield
 
-        `placeholder` (optional) of textField to touch
+        `placeholder` of textField to touch
         '''
         if not placeholder:
             self.touch("textField")
         else:
             self.touch("textField placeholder:'%s'" % placeholder)
 
-    def set_text(self, txt, query="textField"):
-        text_fields_modified = self._map(query, "setText", [txt])
+    def set_text(self, value, query="textField"):
+        '''
+        Set the value of a textField
+
+        `value` the new value of the textField
+
+        `query` query selector to find the textField that will be set to the new value
+        '''
+        text_fields_modified = self._map(query, "setText", [value])
+
         if not text_fields_modified:
             raise IOSLibraryException("could not find text field %s" % query)
 
@@ -304,8 +349,11 @@ class IOSLibrary(object):
 
     def rotate(self, direction):
         '''
-        Rotate simulator { left | right }
+        Rotate the simulator
+
+        `direction` The direction to rotate the simulator in. Valid values are "left" and "right".
         '''
+
         if direction == "right":
             self._current_orientation -= 90
         elif direction == "left":
@@ -316,14 +364,22 @@ class IOSLibrary(object):
 
     def set_device_orientation_to(self, orientation, direction="left"):
         '''
-        Set orientation of simulator to { up | down | left | right}
+        Set orientation of the simulator
+
+        `orientation` The final orientation the simulator should have afterwards. Valid values are "up", "down", "left", "right".
+
+        `direction` The direction to rotate the simulator in until it reached the final orientation. Valid values are "left" and "right".
         '''
         degrees = ORIENTATIONS[orientation]
         self._rotate_to(degrees, direction)
 
     def scroll(self, direction, query="scrollView index:0"):
         '''
-        Scroll { up | down | left | right}
+        Scroll the view.
+
+        `direction` direction to scroll in. Valid values are "up", "down", "left", "right"
+
+        `query` selector of the view to scroll in. Defaults to the first scrollView.
         '''
         views_touched = self._map(query, "scroll", [direction])
         if not views_touched:
@@ -332,10 +388,11 @@ class IOSLibrary(object):
 
     def pinch(self, direction, query=None):
         '''
-        pinch {in | out}
+        Pinch in or out.
 
-        `direction` in or out
-        `query` (optional) to specify an element to pinch on
+        `direction` to pinch. Valid values are "in" and "out".
+
+        `query` selector of the element to pinch on
         '''
         options = {}
         if query:
@@ -344,7 +401,9 @@ class IOSLibrary(object):
 
     def swipe(self, direction):
         '''
-        { up | down | left | right}
+        Swipe.
+
+        `direction` The direction to swipe in. Valid values are "up", "down", "left", "right"
         '''
         degrees = ORIENTATIONS[direction]
         direction = (360 - self._current_orientation) + degrees
@@ -355,6 +414,8 @@ class IOSLibrary(object):
     def screen_should_contain_text(self, expected):
         '''
         Asserts that the current screen contains a given text
+
+        `expected` The text that should be on the screen
         '''
         if not self._element_exists("view {text == '%s'}" %
                                     expected.replace("'", r"\'")):
@@ -365,7 +426,7 @@ class IOSLibrary(object):
         Asserts that the current screen contains a given element
         specified by name or query
 
-        `expected` { String | View } that should be on the current screen
+        `expected` String or View that should be on the current screen
         '''
         res = (self._element_exists("view marked:'%s'" % expected) or
                self._element_exists(expected))
@@ -377,7 +438,9 @@ class IOSLibrary(object):
         '''
         Asserts that the current webview contains a given text
 
-        `index` index of the webView (default = 0)
+        `expected` text that should be in the webview
+
+        `index` index of the webView
         '''
         if not expected in self._get_webview_html(index):
             raise IOSLibraryException("%s not found in webView" % expected)
@@ -386,7 +449,7 @@ class IOSLibrary(object):
         '''
         Asserts that the current webview is not empty
 
-        `index` index of the webView (default = 0)
+        `index` index of the webView
         '''
         if not self._get_webview_html(index):
             raise IOSLibraryException("Webview is empty")
