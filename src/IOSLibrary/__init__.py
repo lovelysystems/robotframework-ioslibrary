@@ -85,7 +85,8 @@ class IOSLibrary(object):
 
         `app_path` Path to the binary of the App to start.
         '''
-        assert os.path.exists(app_path), "Couldn't find app binary at %s" % app
+        app_path = os.path.expanduser(app_path)
+        assert os.path.exists(app_path), "Couldn't find app binary at %s" % app_path
         self._app = app_path
 
         cmd = [self._simulator,
