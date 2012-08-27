@@ -49,6 +49,13 @@ class IOSLibrary(object):
         self._current_orientation = 0
         self._device = "iPhone"
 
+    def set_simulator(self, simulator_path):
+        """
+        (deprecated) set the path to the ios simulator 
+        """
+        logging.warning("Set Simulator is deprecated")
+        pass
+
     def set_device(self, device_name):
         '''
         Set the simulated device
