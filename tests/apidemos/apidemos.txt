@@ -7,8 +7,8 @@ Suite Teardown          Stop Simulator
 
 *** Keywords ***
 Setup Simulator
+    Set Device           ipad
     Start Simulator      sample.app
-    Set Device          iPad
     Wait Until Keyword Succeeds
     ...   1min
     ...   5sec
