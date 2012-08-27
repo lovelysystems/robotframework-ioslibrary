@@ -7,8 +7,8 @@ Suite Teardown          Stop Simulator
 
 *** Keywords ***
 Setup Simulator
-    Set Simulator    /Applications/Xcode.app/Contents/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator
-    Start Simulator      sample.app/LPSimpleExample\ copy
+    Start Simulator      sample.app
+    Set Device          iPad
     Wait Until Keyword Succeeds
     ...   1min
     ...   5sec

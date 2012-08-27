@@ -29,5 +29,5 @@ setup(
   package_dir      = {'' : 'src'},
   install_requires = ['robotframework', 'requests'],
   packages         = ['IOSLibrary'],
-  package_data     = {'IOSLibrary': ['resources/*']}
+  package_data     = {'IOSLibrary': ['resources/*',]}
 )

@@ -27,10 +27,6 @@ ORIENTATIONS_REV = {
     270: "left"
 }
 
-DEFAULT_SIMULATOR = ("/Applications/Xcode.app/Contents/Applications/" +
-                     "iPhone Simulator.app/Contents/MacOS/iPhone Simulator")
-
-
 class IOSLibraryException(Exception):
     pass
 
@@ -51,25 +47,7 @@ class IOSLibrary(object):
         self._url = 'http://%s/' % device_endpoint
         self._screenshot_index = 0
         self._current_orientation = 0
-        if os.path.exists(DEFAULT_SIMULATOR):
-            self.set_simulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
-
-    def set_simulator(self, simulator_path=DEFAULT_SIMULATOR):
-        '''
-        Set the path where the iOS Simulator is found.
-
-        If the iOS Simulator is at the default location, you don't need to call
-        this. However, if you are using beta release of XCode, you can choose
-        which simulator to use.
-
-        `simulator_path` fully qualified path to the iOS Simulator executable.
-        '''
-
-        assert os.path.exists(simulator_path), (
-                "Couldn't find simulator at %s" % simulator_path)
-
-        self._simulator = simulator_path
 
     def set_device(self, device_name):
         '''
@@ -88,12 +66,14 @@ class IOSLibrary(object):
         app_path = os.path.expanduser(app_path)
         assert os.path.exists(app_path), "Couldn't find app binary at %s" % app_path
         self._app = app_path
+        wax = os.path.join(
+                        os.path.join(os.path.dirname(__file__), 'resources'),
+                        'waxsim')
 
-        cmd = [self._simulator,
-               '-SimulateDevice',
-               self._device,
-               '-SimulateApplication',
-               app_path]
+        cmd = [wax,
+               app_path,
+               '-f',
+               self._device]
         self._simulator_proc = subprocess.Popen(cmd)
 
     def stop_simulator(self):
