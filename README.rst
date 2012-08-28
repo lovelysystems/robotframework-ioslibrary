@@ -23,6 +23,22 @@ Prepare your iOS app
 
 To prepare your iOS app look at <https://github.com/calabash/calabash-ios#installation>
 
+Install Waxsim
+++++++++++++++
+
+To get full simulator support, e.g.: for testing in app purchases
+you have to install waxsim.
+
+Download the source from::
+
+https://github.com/jonathanpenn/WaxSim/tarball/93d4dd1d137609eb2dd7dd97161d8b7d7b8267e9
+
+change into the directory and build it with::
+
+xcodebuild
+
+Then add the binary to your path
+
 Usage
 +++++
 
