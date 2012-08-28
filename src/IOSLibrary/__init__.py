@@ -54,7 +54,6 @@ class IOSLibrary(object):
         (deprecated) set the path to the ios simulator 
         """
         logging.warning("Set Simulator is deprecated")
-        pass
 
     def set_device(self, device_name):
         '''
@@ -77,10 +76,11 @@ class IOSLibrary(object):
                         os.path.join(os.path.dirname(__file__), 'resources'),
                         'waxsim')
 
+        logging.error(self._device.lower())
         cmd = [wax,
-               app_path,
                '-f',
-               self._device]
+               self._device,
+               app_path]
         self._simulator_proc = subprocess.Popen(cmd)
 
     def stop_simulator(self):
