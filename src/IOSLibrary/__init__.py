@@ -222,6 +222,7 @@ class IOSLibrary(object):
 
     def _get_webview_html(self, index):
         res = self.query("webView css:'body'")
+        index = int(index)
         if not res or not res[index]:
             raise IOSLibraryException("No WebView with index %i found" % index)
         return res[index]["html"]

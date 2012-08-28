@@ -66,4 +66,4 @@ I can handle webviews
     touch   tabBarButton index:3
     Webview should not be empty
     Wait Until Keyword Succeeds   10sec   2sec
-    ...     Webview should contain  Google
+    ...     Webview should contain  Google   index=0
