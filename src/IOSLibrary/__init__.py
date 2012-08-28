@@ -59,9 +59,9 @@ class IOSLibrary(object):
         '''
         Set the simulated device
 
-        `device` The device to simulate. Valid values are: "iPhone", "iPad", "iPhone (Retina)" and "iPad (Retina)"
+        `device` The device to simulate. Valid values are: "iPhone" and "iPad"
         '''
-        self._device = device_name
+        self._device = device_name.lower()
 
     def start_simulator(self, app_path):
         '''
@@ -76,7 +76,6 @@ class IOSLibrary(object):
                         os.path.join(os.path.dirname(__file__), 'resources'),
                         'waxsim')
 
-        logging.error(self._device.lower())
         cmd = [wax,
                '-f',
                self._device,
