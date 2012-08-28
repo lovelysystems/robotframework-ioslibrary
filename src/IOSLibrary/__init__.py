@@ -51,9 +51,19 @@ class IOSLibrary(object):
         self._url = 'http://%s/' % device_endpoint
         self._screenshot_index = 0
         self._current_orientation = 0
+        self._waxsim = self._find_waxsim()
         if os.path.exists(DEFAULT_SIMULATOR):
             self.set_simulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
+
+    def _find_waxsim(self):
+        path = os.environ['PATH']
+        for d in path.split(os.pathsep):
+            if os.path.exists(d):
+                files = os.listdir(d)
+                if 'waxsim' in files:
+                    return os.path.join(d, 'waxsim')
+        return None
 
     def set_simulator(self, simulator_path=DEFAULT_SIMULATOR):
         '''
@@ -65,10 +75,6 @@ class IOSLibrary(object):
 
         `simulator_path` fully qualified path to the iOS Simulator executable.
         '''
-
-        assert os.path.exists(simulator_path), (
-                "Couldn't find simulator at %s" % simulator_path)
-
         self._simulator = simulator_path
 
     def set_device(self, device_name):
@@ -79,21 +85,49 @@ class IOSLibrary(object):
         '''
         self._device = device_name
 
+
+    def _get_app_and_binary(self, app_path):
+        filename, ext = os.path.splitext(app_path)
+        binary = None
+        if ext == '.app':
+            binary = os.path.join(app_path,filename)
+        elif ext == '':
+            app_path = os.path.dirname(app_path)
+            binary = filename
+        return app_path, binary
+
+    def _check_simulator(self):
+        assert (os.path.exists(self._simulator) or (self._waxsim and os.path.exists(self._waxsim))), (
+                "neither simulator at %s nor waxsim could be found" % self._simulator)
+
+
     def start_simulator(self, app_path):
         '''
         Starts the App found at `app_path` in the iOS Simulator.
 
         `app_path` Path to the binary of the App to start.
         '''
+        self._check_simulator()
         app_path = os.path.expanduser(app_path)
-        assert os.path.exists(app_path), "Couldn't find app binary at %s" % app_path
-        self._app = app_path
+        assert os.path.exists(app_path), "Couldn't find app bundle or binary at %s" % app_path
 
-        cmd = [self._simulator,
-               '-SimulateDevice',
-               self._device,
-               '-SimulateApplication',
-               app_path]
+        cmd = []
+        app_path, binary = self._get_app_and_binary(app_path)
+        if not self._waxsim:
+
+            assert binary, "Could not parse app binary name"
+            assert os.path.exists(binary), "Could not find app binary at %s" % app_path
+            logging.warning("Waxsim not found, execute app without installing it in simulator")
+            cmd = [self._simulator,
+                  '-SimulateDevice',
+                  self._device,
+                  '-SimulateApplication',
+                  binary]
+        else:
+            cmd = [self._waxsim,
+                   '-f',
+                   self._device.lower(),
+                   app_path]
         self._simulator_proc = subprocess.Popen(cmd)
 
     def stop_simulator(self):
