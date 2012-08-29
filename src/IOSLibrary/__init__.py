@@ -101,7 +101,7 @@ class IOSLibrary(object):
                 "neither simulator at %s nor waxsim could be found" % self._simulator)
 
 
-    def start_simulator(self, app_path):
+    def start_simulator(self, app_path, sdk='5.1'):
         '''
         Starts the App found at `app_path` in the iOS Simulator.
 
@@ -125,6 +125,8 @@ class IOSLibrary(object):
                   binary]
         else:
             cmd = [self._waxsim,
+                   '-s',
+                   sdk,
                    '-f',
                    self._device.lower(),
                    app_path]
