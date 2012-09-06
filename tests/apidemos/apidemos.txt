@@ -1,12 +1,13 @@
 *** Settings ***
 
-Library                 IOSLibrary      localhost:37265
+Library                 IOSLibrary
 
 Suite Setup             Setup Simulator
 Suite Teardown          Stop Simulator
 
 *** Keywords ***
 Setup Simulator
+    Set Device URL      http://localhost:37265
     Set Simulator    /Applications/Xcode.app/Contents/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator
     Start Simulator      LPSimpleExample.app
     Wait Until Keyword Succeeds
@@ -35,7 +36,7 @@ I can toggle switch
 I can scroll
     touch   tabBarButton index:2
     scroll  up
-    scroll  down query=scrollView index:0  
+    scroll  down query=scrollView index:0
 
 I can pinch
     touch   tabBarButton index:1
@@ -54,7 +55,7 @@ I can check content
 I can enter text
     Set text    Spam   query=textField
     Screen should contain text  Spam
-    
+
 I can rotate the device to
     Set device orientation to   left
     Set device orientation to   right
