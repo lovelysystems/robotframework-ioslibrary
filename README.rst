@@ -60,6 +60,7 @@ Library          IOSLibrary
 ============  =================================  ===================================  ==========     ========================
 Example
 \             [Documentation]                    Starts the iOS Simulator and swipes
+\             Set Device URL                     localhost:37265
 \             Start Simulator
 \             Wait Until Keyword Succeeds        1 minute                             5 seconds      Is Device Available
 \             Swipe                              right
