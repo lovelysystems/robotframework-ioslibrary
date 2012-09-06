@@ -58,7 +58,7 @@ class IOSLibrary(object):
             self.set_simulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
 
-    def set_device_url(self, url="http://localhost:37265"):
+    def set_device_url(self, url):
         """
         Set the device url where the application is started.
 
