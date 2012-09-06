@@ -41,7 +41,7 @@ class IOSLibrary(object):
     ROBOT_LIBRARY_VERSION = VERSION
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
-    def __init__(self, device_endpoint=None):
+    def __init__(self, device_endpoint='localhost:37265'):
         """
         Initialize the IOSLibrary.
 
