@@ -9,7 +9,7 @@ Suite Teardown          Stop Simulator
 Setup Simulator
     Set Device URL      http://localhost:37265
     Set Simulator    /Applications/Xcode.app/Contents/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator
-    Start Simulator      LPSimpleExample.app
+    Start Simulator      LPSimpleExample.app   sdk=5.1
     Wait Until Keyword Succeeds
     ...   1min
     ...   5sec
