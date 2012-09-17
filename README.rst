@@ -74,3 +74,7 @@ License
 robotframework is a port of the ruby-based `calabash-ios` and therefore
 licensed under the  `Eclipse Public License (EPL) v1.0
 <http://www.eclipse.org/legal/epl-v10.html>`_
+
+Development by `Lovely Systems GmbH <http://www.lovelysystems.com/>`_,
+sponsored by `Axel Springer AG <http://www.axelspringer.de/>`_.
+
