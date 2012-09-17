@@ -164,12 +164,13 @@ class IOSLibrary(object):
         logging.getLogger().setLevel(logging.ERROR)
         status_code = 0
         try:
-            status_code = requests.get(self._url).status_code
+            resp = requests.get(self._url+'/version')
+            status_code = resp.status_code
         except:
             raise
         finally:
             logging.getLogger().setLevel(logging.WARNING)
-        assert status_code == 405, "Device is not available"
+        assert status_code == 200, "Device is not available"
 
     def _post(self, endp, request):
         url = urljoin(self._url, endp)
