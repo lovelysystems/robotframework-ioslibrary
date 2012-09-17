@@ -164,7 +164,7 @@ class IOSLibrary(object):
         logging.getLogger().setLevel(logging.ERROR)
         status_code = 0
         try:
-            resp = requests.get(self._url+'/version')
+            resp = self._get('version')
             status_code = resp.status_code
         except:
             raise
@@ -200,6 +200,7 @@ class IOSLibrary(object):
             }
         })
         res = self._post("map", data)
+        logging.debug("<< %r %r", res.status_code, res.text)
         res = json.loads(res.text)
         if res['outcome'] != 'SUCCESS':
             raise IOSLibraryException('map %s failed because: %s \n %s' %
