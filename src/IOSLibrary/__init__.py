@@ -177,7 +177,7 @@ class IOSLibrary(object):
         logging.info("Request to device %s: %s", url, request)
 
         res = requests.post(url, data=request, headers={
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/json;charset=utf-8'
         })
 
         logging.info("Response from device %s: %s", url, res.text)
@@ -238,11 +238,10 @@ class IOSLibrary(object):
         }
         if options:
             post_data.update(options)
-        res = json.loads(self._post('play', json.dumps(post_data)).text)
-        if res['outcome'] != 'SUCCESS':
+        res = self._post('play', json.dumps(post_data))
+        if res.status_code != 200:
             raise IOSLibraryException('playback failed because: %s \n %s' %
                                        (res['reason'], res['details']))
-        return res['results']
 
     def _rotate_to(self, orientation, direction="left"):
         orientation = self._reduce_degrees(orientation)
