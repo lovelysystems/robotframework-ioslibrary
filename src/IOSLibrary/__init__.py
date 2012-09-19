@@ -140,7 +140,8 @@ class IOSLibrary(object):
                    '-f',
                    self._device.lower(),
                    app_path]
-        self._simulator_proc = subprocess.Popen(cmd)
+        with open("waxsim.log", "w") as logfile:
+            self._simulator_proc = subprocess.Popen(cmd, stderr=logfile)
 
     def stop_simulator(self):
         """
@@ -174,13 +175,10 @@ class IOSLibrary(object):
 
     def _post(self, endp, request):
         url = urljoin(self._url, endp)
-        logging.info("Request to device %s: %s", url, request)
-
         res = requests.post(url, data=request, headers={
           'Content-Type': 'application/json;charset=utf-8'
         })
 
-        logging.info("Response from device %s: %s", url, res.text)
         return res
 
     def _get(self, endp):
