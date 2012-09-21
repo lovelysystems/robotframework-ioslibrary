@@ -237,9 +237,11 @@ class IOSLibrary(object):
         if options:
             post_data.update(options)
         res = self._post('play', json.dumps(post_data))
-        if res.status_code != 200:
+        jres = json.loads(res.text)
+        if res.status_code != 200 or jres['outcome']!='SUCCESS':
             raise IOSLibraryException('playback failed because: %s \n %s' %
-                                       (res['reason'], res['details']))
+                                       (jres['reason'], jres['details']))
+        return res
 
     def _rotate_to(self, orientation, direction="left"):
         orientation = self._reduce_degrees(orientation)
@@ -328,7 +330,7 @@ class IOSLibrary(object):
 
         `query` selector of the element to touch. The available syntax is documented here https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
         """
-        self._playback("touch", {"query": query})
+        return self._playback("touch", {"query": query})
 
     def touch_position(self, x=0, y=0):
         """
