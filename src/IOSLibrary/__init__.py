@@ -104,25 +104,26 @@ class IOSLibrary(object):
         """
         Set the simulated device
 
-        `device` The device to simulate. Valid values are: "iPhone", "iPad", "iPhone (Retina)" and "iPad (Retina)"
+        `device` The device to simulate. Valid values are:
+        "iPhone", "iPad", "iPhone (Retina)" and "iPad (Retina)"
         """
         self._device = device_name
-
 
     def _get_app_and_binary(self, app_path):
         filename, ext = os.path.splitext(app_path)
         binary = None
         if ext == '.app':
-            binary = os.path.join(app_path,filename)
+            binary = os.path.join(app_path, filename)
         elif ext == '':
             app_path = os.path.dirname(app_path)
             binary = filename
         return app_path, binary
 
     def _check_simulator(self):
-        assert (os.path.exists(self._simulator) or (self._waxsim and os.path.exists(self._waxsim))), (
-                "neither simulator at %s nor waxsim could be found" % self._simulator)
-
+        assert (os.path.exists(self._simulator) or
+                (self._waxsim and os.path.exists(self._waxsim))), (
+                "neither simulator at %s nor waxsim could be found"
+                % self._simulator)
 
     def start_simulator(self, app_path, sdk='5.1'):
         """
@@ -132,14 +133,16 @@ class IOSLibrary(object):
         """
         self._check_simulator()
         app_path = os.path.expanduser(app_path)
-        assert os.path.exists(app_path), "Couldn't find app bundle or binary at %s" % app_path
+        assert os.path.exists(app_path), \
+                "Couldn't find app bundle or binary at %s" % app_path
 
         cmd = []
         app_path, binary = self._get_app_and_binary(app_path)
         if not self._waxsim:
 
             assert binary, "Could not parse app binary name"
-            assert os.path.exists(binary), "Could not find app binary at %s" % app_path
+            assert os.path.exists(binary), \
+                "Could not find app binary at %s" % app_path
             logging.warning("Waxsim not found, execute app without installing it in simulator")
             cmd = [self._simulator,
                   '-SimulateDevice',
@@ -164,7 +167,9 @@ class IOSLibrary(object):
                         os.path.join(os.path.dirname(__file__), 'resources'),
                         "reset.applescript")
         cmd = ["osascript",p]
-        subprocess.Popen(cmd)
+        with open("reset_sim.log","w") as logfile:
+            with open("reset_sim.err.log","w") as errfile:
+                self._reset = subprocess.Popen(cmd, stdout=logfile, stderr=errfile)
 
     def stop_simulator(self):
         """
