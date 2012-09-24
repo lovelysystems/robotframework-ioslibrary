@@ -39,6 +39,13 @@ xcodebuild
 
 Then add the binary to your path
 
+Simulator Reset
++++++++++++++++
+
+To use `Reset Simultor` enable:
+
+    System preferences -> Accesability -> Enable access for Assisted devices
+
 Usage
 +++++
 
