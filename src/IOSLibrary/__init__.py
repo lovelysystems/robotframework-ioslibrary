@@ -143,6 +143,16 @@ class IOSLibrary(object):
         with open("waxsim.log", "w") as logfile:
             self._simulator_proc = subprocess.Popen(cmd, stderr=logfile)
 
+    def reset_simulator(self):
+        """
+        Reset the simulator. Warning the simulator should run
+        """
+        p = os.path.join(
+                        os.path.join(os.path.dirname(__file__), 'resources'),
+                        "reset.applescript")
+        cmd = ["osascript",p]
+        subprocess.Popen(cmd)
+
     def stop_simulator(self):
         """
         Stops a previously started iOS Simulator.
