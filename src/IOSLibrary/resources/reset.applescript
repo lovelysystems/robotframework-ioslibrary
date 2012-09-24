@@ -6,13 +6,13 @@ tell application "iPhone Simulator"
         tell process "iPhone Simulator"
                 tell menu bar 1
                     try
-                        tell menu bar item "iOS Simulator"
-                            tell menu "iOS Simulator"
+                        tell menu bar item "iOS-Simulator"
+                            tell menu "iOS-Simulator"
                                 click menu item "Reset Content and Settings…"
                             end tell
                         end tell
                     on error
-                        tell menu bar item "iOS-Simulator"
+                        tell menu bar item "iOS Simulator"
                             tell menu "iOS Simulator"
                                 click menu item "Reset Content and Settings…"
                             end tell
