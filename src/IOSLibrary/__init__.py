@@ -54,6 +54,8 @@ class IOSLibrary(object):
         self._screenshot_index = 0
         self._current_orientation = 0
         self._waxsim = self._find_waxsim()
+        self._username = None
+        self._password = None
         if os.path.exists(DEFAULT_SIMULATOR):
             self.set_simulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
@@ -65,6 +67,17 @@ class IOSLibrary(object):
         `url` the base url to use for all requests
         """
         self._url = url
+
+    def set_basic_auth(self, username, password):
+        '''
+        Set basic authentication to use with all further API calls
+
+        username is the username to authenticate with, e.g. 'Aladdin'
+
+        password is the password to use, e.g. 'open sesame'
+        '''
+        self._username = username
+        self._password = password
 
     def _find_waxsim(self):
         path = os.environ['PATH']
@@ -183,16 +196,20 @@ class IOSLibrary(object):
             logging.getLogger().setLevel(logging.WARNING)
         assert status_code == 200, "Device is not available"
 
-    def _post(self, endp, request):
+    def _post(self, endp, request, **kwargs):
+        if self._username != None and self._username != None:
+            kwargs['auth'] = (self._username, self._password)
         url = urljoin(self._url, endp)
         res = requests.post(url, data=request, headers={
           'Content-Type': 'application/json;charset=utf-8'
-        })
+        }, **kwargs)
 
         return res
 
-    def _get(self, endp):
-        res = requests.get(urljoin(self._url, endp))
+    def _get(self, endp, **kwargs):
+        if self._username != None and self._username != None:
+            kwargs['auth'] = (self._username, self._password)
+        res = requests.get(urljoin(self._url, endp), **kwargs)
         assert res.status_code == 200, (
                 "Device sent http status code %d" % res.status_code)
         return res
@@ -247,10 +264,21 @@ class IOSLibrary(object):
         if options:
             post_data.update(options)
         res = self._post('play', json.dumps(post_data))
-        jres = json.loads(res.text)
-        if res.status_code != 200 or jres['outcome']!='SUCCESS':
-            raise IOSLibraryException('playback failed because: %s \n %s' %
-                                       (jres['reason'], jres['details']))
+        fail = False
+        if res.status_code != 200:
+            fail = True 
+            error_msg = "device url sent status code %s", res.status_code
+
+        try:
+            jres = json.loads(res.text)
+            if jres['outcome'] != 'SUCCESS':
+                fail = True
+                error_msg = "%s %s" % (jres['reason'], jres['details'])
+        except ValueError:
+            pass
+
+        if fail:
+            raise IOSLibraryException('playback failed because: %s' % error_msg)
         return res
 
     def _rotate_to(self, orientation, direction="left"):
