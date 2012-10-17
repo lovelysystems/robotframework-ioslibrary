@@ -180,6 +180,17 @@ class IOSLibrary(object):
         stop_proc.wait()
         self._simulator_proc.wait()
 
+    def set_basic_auth(self, username, password):
+        '''
+        Set basic authentication to use with all further API calls
+
+        username is the username to authenticate with, e.g. 'Aladdin'
+
+        password is the password to use, e.g. 'open sesame'
+        '''
+        self._username = username
+        self._password = password
+
     def is_device_available(self):
         """
         Succeeds if the test server is available for receiving commands.
