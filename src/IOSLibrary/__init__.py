@@ -201,7 +201,9 @@ class IOSLibrary(object):
         Example:
         | Wait Until Keyword Succeeds | 1 minute | 10 seconds | Is device available |
         """
-        logging.getLogger().setLevel(logging.ERROR)
+        logger = logging.getLogger()
+        previous_loglevel = logger.getEffectiveLevel()
+        logger.setLevel(logging.ERROR)
         status_code = 0
         try:
             resp = self._get('version')
@@ -209,7 +211,7 @@ class IOSLibrary(object):
         except:
             raise
         finally:
-            logging.getLogger().setLevel(logging.WARNING)
+            logger.setLevel(previous_loglevel)
         assert status_code == 200, "Device is not available"
 
     def _post(self, endp, request, **kwargs):
