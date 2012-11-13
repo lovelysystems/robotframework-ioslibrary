@@ -324,8 +324,12 @@ class IOSLibrary(object):
             return False
         return True
 
-    def _get_webview_html(self, index):
-        res = self.query("webView css:'body'")
+    def _get_webview_html(self, query=None, index=None):
+        if not index: index = 0
+        if not query: query = ""
+
+        res = self.query("webView %s css:'body'" % query)
+
         index = int(index)
         if not res or not res[index]:
             raise IOSLibraryException("No WebView with index %i found" % index)
@@ -540,24 +544,28 @@ class IOSLibrary(object):
             raise IOSLibraryException("No element found with mark or text %s" %
                                       expected)
 
-    def webview_should_contain(self, expected, index=0):
+    def webview_should_contain(self, expected, index=0, query=None):
         """
         Asserts that the current webview contains a given text
 
         `expected` text that should be in the webview
 
         `index` index of the webView
+
+        `query` query to find the webview (e.g. "marked:'Tears in Heaven'", for full query syntax see https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
         """
-        if not expected in self._get_webview_html(index):
+        if not expected in self._get_webview_html(query, index):
             raise IOSLibraryException("%s not found in webView" % expected)
 
-    def webview_should_not_be_empty(self, index=0):
+    def webview_should_not_be_empty(self, index=0, query=None):
         """
         Asserts that the current webview is not empty
 
         `index` index of the webView
+
+        `query` query to find the webview (e.g. "marked:'Tears in Heaven'", for full query syntax see https://github.com/calabash/calabash-ios/wiki/05-Query-syntax
         """
-        if not self._get_webview_html(index):
+        if not self._get_webview_html(query, index):
             raise IOSLibraryException("Webview is empty")
 
     # END: DEFINITIONS
