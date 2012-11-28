@@ -328,7 +328,7 @@ class IOSLibrary(object):
         if not index: index = 0
         if not query: query = ""
 
-        res = self.query("webView %s css:'body'" % query)
+        res = self.query("webView " + (query and query + " " or "") + "css:'body'")
 
         index = int(index)
         if not res or not res[index]:

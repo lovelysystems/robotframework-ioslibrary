@@ -2,8 +2,14 @@
 Changes for robotframework-ioslibrary
 =====================================
 
-unreleased
-==========
+2012-11-28 0.1.22
+=================
+
+ - fix bug where "WebView Should Not Be Empty" without any arguments would
+   crash calabash-ios-server
+
+0.1.21
+======
 
  - 'Webview Should Contain', 'Webview Should Not Be Empty' keywords support
    query= parameter
