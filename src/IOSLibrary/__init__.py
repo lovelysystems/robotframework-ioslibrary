@@ -244,11 +244,19 @@ class IOSLibrary(object):
         })
         res = self._post("map", data)
         logging.debug("<< %r %r", res.status_code, res.text)
-        res = json.loads(res.text)
+
+        res = self._parse_json(res.text)
+
         if res['outcome'] != 'SUCCESS':
             raise IOSLibraryException('map %s failed because: %s \n %s' %
                                       (query, res['reason'], res['details']))
         return res['results']
+
+    def _parse_json(self, to_parse):
+        try:
+            return json.loads(to_parse)
+        except ValueError as e:
+            raise IOSLibraryException("Testserver response '%s' couldn't be parsed as json: %s" % (to_parse, e.message))
 
     def _screenshot(self, filename=None):
         res = self._get('screenshot')
@@ -288,7 +296,7 @@ class IOSLibrary(object):
             error_msg = "device url sent status code %s", res.status_code
 
         try:
-            jres = json.loads(res.text)
+            jres = self._parse_json(res.text)
             if jres['outcome'] != 'SUCCESS':
                 fail = True
                 error_msg = "%s %s" % (jres['reason'], jres['details'])
