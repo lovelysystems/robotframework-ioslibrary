@@ -2,6 +2,12 @@
 Changes for robotframework-ioslibrary
 =====================================
 
+unreleased
+==========
+
+ - Keyword "Screen Should Contain Text" now matches substrings to better fit
+   it's name
+
 2012-11-28 0.1.22
 =================
 
