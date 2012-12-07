@@ -517,17 +517,24 @@ class IOSLibrary(object):
             options = {"query": query}
         self._pinch(direction, options)
 
-    def swipe(self, direction):
+    def swipe(self, direction, query=None):
         """
         Swipe.
 
         `direction` The direction to swipe in. Valid values are "up", "down", "left", "right"
+
+        `query` query identifiying the element of the screen to be swiped on, e.g. "view marked:'foo'"
         """
         degrees = ORIENTATIONS[direction]
         direction = (360 - self._current_orientation) + degrees
         direction = self._reduce_degrees(direction)
         direction = ORIENTATIONS_REV[direction]
-        self._playback("swipe_%s" % direction)
+
+        options = {}
+        if query:
+            options["query"] = query
+
+        self._playback("swipe_%s" % direction, options)
 
     def screen_should_contain_text(self, expected):
         """

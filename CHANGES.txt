@@ -5,6 +5,8 @@ Changes for robotframework-ioslibrary
 unreleased
 ==========
 
+ - "Swipe" now takes a query option
+
  - Keyword "Screen Should Contain Text" now matches substrings to better fit
    it's name
 
