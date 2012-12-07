@@ -8,6 +8,9 @@ unreleased
  - Keyword "Screen Should Contain Text" now matches substrings to better fit
    it's name
 
+ - in case of invalid json returned by the testserver, print both the string
+   and the error message
+
 2012-11-28 0.1.22
 =================
 
