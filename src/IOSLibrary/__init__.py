@@ -527,7 +527,8 @@ class IOSLibrary(object):
 
         `expected` The text that should be on the screen
         """
-        if not self._element_exists("view {text == '%s'}" %
+
+        if not self._element_exists("view {text LIKE '*%s*'}" %
                                     expected.replace("'", r"\'")):
             raise IOSLibraryException("No text %s found" % expected)
 
