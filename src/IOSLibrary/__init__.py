@@ -59,6 +59,7 @@ class IOSLibrary(object):
         if os.path.exists(DEFAULT_SIMULATOR):
             self.set_simulator(DEFAULT_SIMULATOR)
         self._device = "iPhone"
+        self._ios_major_version = 5
 
     def set_device_url(self, url):
         """
@@ -100,14 +101,32 @@ class IOSLibrary(object):
         """
         self._simulator = simulator_path
 
-    def set_device(self, device_name):
+    def set_device(self, device_name="iPhone"):
         """
-        Set the simulated device
+        Set the device. This is used for the simulator as well as for choosing
+        the correct gestures.
 
-        `device` The device to simulate. Valid values are:
+        `device` The device that is connected. Valid values are:
         "iPhone", "iPad", "iPhone (Retina)" and "iPad (Retina)"
         """
+        allowed = ("iPhone", "iPad", "iPhone (Retina)", "iPad (Retina)")
+
+        assert device_name in allowed, "%s is not in %r, but should be." % (device_name, allowed)
+
         self._device = device_name
+
+
+    def set_ios_version(self, ios_major_version=5):
+        """
+        Set the iOS Version used for sending the correct gestures.
+
+        `ios_version` The iOS version of the device that is connceted. Valid
+        values are: 4, 5, 6, must be a number.
+        """
+
+        assert type(ios_version) is int, "%s is not a number, but should be." % (device_name, allowed)
+
+        self._ios_major_version = ios_major_version
 
     def _get_app_and_binary(self, app_path):
         filename, ext = os.path.splitext(app_path)
@@ -266,19 +285,25 @@ class IOSLibrary(object):
         logger.info('</td></tr><tr><td colspan="3"><a href="%s">'
                    '<img src="%s"></a>' % (link, link), True, False)
 
-    def _load_playback_data(self, recording, options=None):
-        if options is None:
-            options = {}
-        ios = options.get("OS", "ios5")
-        device = options.get("DEVICE", "iphone")
+    def _load_playback_data(self, recording):
+
         if not recording.endswith(".base64"):
-            recording = "%s_%s_%s.base64" % (recording, ios, device)
+            recording = "%s_ios%d_%s.base64" % (
+                    recording,
+                    self._ios_major_version,
+                    self._device.split(" ")[0].lower())
+
         p = os.path.join(
-                        os.path.join(os.path.dirname(__file__), 'resources'),
-                        recording)
+            os.path.join(os.path.dirname(__file__), 'resources'),
+            recording
+        )
+
         if os.path.exists(p):
             with open(p, 'r') as f:
                 return f.read()
+        elif self._ios_major_version == 6:
+            # we can reuse most of the ios5 gestures on ios6
+            return self._load_playback_data(recording.replace("6", "5"))
         else:
             raise IOSLibraryException('Playback not found: %s' % p)
 
