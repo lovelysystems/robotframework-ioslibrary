@@ -2,6 +2,11 @@
 Changes for robotframework-ioslibrary
 =====================================
 
+2013-02-13 0.1.25
+=================
+
+  - add "Screen Should Contain Query" keyword
+
 2013-02-06 0.1.24
 =================
 
