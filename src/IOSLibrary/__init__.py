@@ -585,6 +585,17 @@ class IOSLibrary(object):
             raise IOSLibraryException("No element found with mark or text %s" %
                                       expected)
 
+    def screen_should_contain_query(self, query):
+        """
+        Asserts that the current screen contains a given element
+        specified by query.
+
+        `query` Element query that should be on the current screen
+        """
+        if not self._element_exists(query):
+            raise IOSLibraryException(
+                    "No element found with query '%s'" % query)
+
     def webview_should_contain(self, expected, index=0, query=None):
         """
         Asserts that the current webview contains a given text
