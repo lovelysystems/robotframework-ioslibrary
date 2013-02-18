@@ -277,8 +277,8 @@ class IOSLibrary(object):
         except ValueError as e:
             raise IOSLibraryException("Testserver response '%s' couldn't be parsed as json: %s" % (to_parse, e.message))
 
-    def _screenshot(self, filename=None):
-        res = self._get('screenshot')
+    def _screenshot(self, filename=None, relative_url='screenshot'):
+        res = self._get(relative_url)
         path, link = self._get_screenshot_paths(filename)
         with open(path, 'w') as f:
             f.write(res.content)
@@ -440,14 +440,15 @@ class IOSLibrary(object):
                         }
                     })
 
-    def capture_screenshot(self, filename=None):
+    def capture_screenshot(self, filename=None, relative_url='screenshot'):
         """
         Captures a screenshot of the current screen and embeds it
         in the test report
 
         `filename` Location where the screenshot will be saved. If omitted a unique filename will be chosen.
+        `relative_url` URL part, relative to the device endpoint. For the standard setup the default value is sufficient.
         """
-        self._screenshot(filename)
+        self._screenshot(filename, relative_url)
 
     def toggle_switch(self, name=None):
         """
