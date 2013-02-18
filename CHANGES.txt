@@ -2,8 +2,8 @@
 Changes for robotframework-ioslibrary
 =====================================
 
-unreleased
-==========
+2013-02-18 0.2.0
+================
 
   - 'Capture Screenshot' now takes a relative_url param
 
