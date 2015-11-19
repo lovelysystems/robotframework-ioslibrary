@@ -11,6 +11,18 @@ It uses `Calabash iOS Server
 instrumented iOS application similar to how `Selenium WebDriver
 <http://seleniumhq.org/projects/webdriver/>`_ talks to your web browser.
 
+Deprecation Warning
++++++++++++++++++++
+
+Lovely Systems does not not support this package anymore and 
+do not have any follow up package in the same area. If anyone is
+interested to continue our efforts and would like to 
+manage the contributors in this open source project,
+feel free to fork the package and give me a hint, so I can 
+create a link to your fork! 
+
+best regards, Manfred (Github: schwendinger, schwendinger at lovelysystems.com)
+
 Installation
 ++++++++++++
 
